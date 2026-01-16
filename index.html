@@ -34,7 +34,16 @@
             padding: 30px 20px;
             text-align: center;
         }
-        .header h1 { margin: 0; font-size: 24px; letter-spacing: 1.5px; }
+        /* 標題對稱樣式 */
+        .header h1 { 
+            margin: 0; 
+            font-size: 24px; 
+            letter-spacing: 1px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* 圖案與文字的間距 */
+        }
         .header p { margin: 12px 0 0; font-size: 15px; opacity: 0.85; font-weight: 300; }
 
         .content { padding: 30px 25px; }
@@ -136,7 +145,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🌳 樹木固碳量計算小幫手</h1>
+        <h1>🌳 樹木固碳量計算小幫手 🌳</h1>
         <p>桃園市社子國小黑松愛地兒團隊 製作</p>
     </div>
 
@@ -196,14 +205,9 @@
             return;
         }
 
-        // 1. 材積
         const radius = c / 3.14 / 2;
         const volume = (radius * radius) * 3.14 * h;
-        
-        // 2. 碳量
         const carbon = volume * 250;
-        
-        // 3. 冷氣次數 (C 轉 CO2 需乘 3.67，除以 0.5kg 每小時冷氣排放)
         const acTimes = (carbon * 3.67) / 0.5;
         
         document.getElementById('volRes').innerText = volume.toFixed(4);
