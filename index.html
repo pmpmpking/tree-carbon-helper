@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樹木固碳量計算小幫手 - 社子國小黑松愛地兒團隊</title>
+    <style>
+        :root {
+            --primary-color: #1b5e20;
+            --accent-color: #43a047;
+            --bg-color: #f1f8e9;
+        }
+        body { 
+            background: var(--bg-color); 
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 { margin: 0; font-size: 24px; letter-spacing: 1.5px; }
+        .header p { margin: 12px 0 0; font-size: 15px; opacity: 0.85; font-weight: 300; }
+
+        .content { padding: 30px 25px; }
+        
+        .input-group { margin-bottom: 25px; }
+        label { 
+            display: block; 
+            margin-bottom: 10px; 
+            font-weight: bold; 
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 14px; 
+            box-sizing: border-box; 
+            font-size: 18px; 
+            transition: all 0.3s ease;
+            background: #fcfcfc;
+        }
+        input:focus { border-color: var(--accent-color); outline: none; background: white; box-shadow: 0 0 8px rgba(67,160,71,0.2); }
+
+        .calc-btn { 
+            width: 100%; 
+            background: var(--accent-color); 
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            border-radius: 14px; 
+            cursor: pointer; 
+            font-size: 20px; 
+            font-weight: bold; 
+            box-shadow: 0 6px 15px rgba(67,160,71,0.3);
+            transition: all 0.3s ease;
+        }
+        .calc-btn:hover { background: #2e7d32; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(67,160,71,0.4); }
+
+        .result-card { 
+            margin-top: 30px; 
+            padding: 25px; 
+            background: #e8f5e9; 
+            border: 2px dashed #a5d6a7;
+            border-radius: 18px; 
+            text-align: center; 
+            display: none; 
+            animation: slideUp 0.5s ease-out;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .val-big { font-size: 42px; color: #1b5e20; font-weight: 800; display: block; margin: 5px 0; }
+        .unit { font-size: 20px; vertical-align: middle; margin-left: 5px; }
+        
+        .comparison-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: #fff;
+            border-radius: 12px;
+            color: #d35400;
+            font-weight: bold;
+            font-size: 15px;
+            border: 1px solid #ffe0b2;
+        }
+
+        .footer {
+            background: #fafafa;
+            padding: 25px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            border-top: 1px solid #eee;
+        }
+        .formula-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+            line-height: 1.8;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 13px;
+            color: #444;
+        }
+        .share-btn {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🌳 樹木固碳量計算小幫手</h1>
+        <p>桃園市社子國小黑松愛地兒團隊 製作</p>
+    </div>
+
+    <div class="content">
+        <div class="input-group">
+            <label>1. 樹木圓周長 (公尺)</label>
+            <input type="number" id="circum" placeholder="測量離地1.3公尺處" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label>2. 樹木高度 (公尺)</label>
+            <input type="number" id="height" placeholder="預估樹木總高度" step="0.1">
+        </div>
+        
+        <button onclick="calculate()" class="calc-btn">立即計算</button>
+
+        <div id="resultCard" class="result-card">
+            <div style="color: #43a047; font-weight: bold; font-size: 16px; margin-bottom: 5px;">✨ 計算成功 ✨</div>
+            <div style="color: #555; font-size: 14px;">這棵樹預估可以幫忙固定</div>
+            <span class="val-big"><span id="carbonRes">0</span><span class="unit">kg 的碳</span></span>
+            
+            <div class="comparison-box">
+                ❄️ 相當於抵銷開冷氣 <span id="acRes">0</span> 次！<br>
+                <small style="font-size: 11px; font-weight: normal;">(以每次開啟 1 小時計算)</small>
+            </div>
+
+            <div style="font-size: 14px; color: #777; margin-top: 12px; padding-top: 12px; border-top: 1px solid #c8e6c9;">
+                樹木材積參考：<span id="volRes">0</span> m³
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div style="font-weight: bold; margin-bottom: 8px; text-align: left; color: #2d5a27;">📝 計算原理說明：</div>
+        <div class="formula-box">
+            1. 材積計算：<br>
+            　 (周長 ÷ 3.14 ÷ 2)² × 3.14 × 樹高 = 材積(V)<br>
+            2. 碳量計算：<br>
+            　 材積(V) × 250 (kg/m³) = 總碳量(kg)<br>
+            3. 生活換算：<br>
+            　 總碳量 × 3.67 ÷ 0.5 (kg/hr) = 冷氣次數
+        </div>
+        <button class="share-btn" onclick="copyLink()">🔗 複製工具連結分享</button>
+        <p style="margin-top:20px; font-weight:bold; color: #333; letter-spacing: 0.5px;">
+            © 2026 社子國小黑松愛地兒團隊
+        </p>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        const c = parseFloat(document.getElementById('circum').value);
+        const h = parseFloat(document.getElementById('height').value);
+        
+        if (isNaN(c) || isNaN(h) || c <= 0 || h <= 0) {
+            alert("請填入正確的數字，小幫手才能幫你計算喔！");
+            return;
+        }
+
+        // 1. 材積
+        const radius = c / 3.14 / 2;
+        const volume = (radius * radius) * 3.14 * h;
+        
+        // 2. 碳量
+        const carbon = volume * 250;
+        
+        // 3. 冷氣次數 (C 轉 CO2 需乘 3.67，除以 0.5kg 每小時冷氣排放)
+        const acTimes = (carbon * 3.67) / 0.5;
+        
+        document.getElementById('volRes').innerText = volume.toFixed(4);
+        document.getElementById('carbonRes').innerText = carbon.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('acRes').innerText = Math.floor(acTimes).toLocaleString();
+        
+        const card = document.getElementById('resultCard');
+        card.style.display = 'block';
+        
+        setTimeout(() => {
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert("連結已複製成功！");
+    }
+</script>
+
+</body>
+</html>
